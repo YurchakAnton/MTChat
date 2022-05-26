@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "777260813116",
+    "project_id": "motortextilechat-73772",
+    "storage_bucket": "motortextilechat-73772.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:777260813116:android:6f3452f39087fe635aec39",
+        "android_client_info": {
+          "package_name": "com.example.mtchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "777260813116-vm6j43ncpuoh6kn0h5bah5b1tma0kjf9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByCr2zXQCGbKlZzj0cG4XjSxEWRBzXemU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "777260813116-vm6j43ncpuoh6kn0h5bah5b1tma0kjf9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

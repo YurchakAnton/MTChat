@@ -1,0 +1,60 @@
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        applicationId "com.example.mtchat"
+        minSdkVersion 19
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+project.ext
+        {
+            googlePlayServicesVersion = "15.0.+"
+        }
+
+dependencies {
+    implementation 'com.github.denzcoskun:ImageSlideshow:0.1.0'
+    implementation 'com.google.firebase:firebase-common:+'
+    implementation 'com.google.android.gms:play-services-auth:+'
+    implementation "androidx.multidex:multidex:2.0.1"
+    implementation 'com.android.support:design:23.4.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.firebaseui:firebase-ui:+'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:19.0.3'
+    testImplementation 'junit:junit:4.12'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.firebaseui:firebase-ui-database:+'
+    implementation platform('com.google.firebase:firebase-bom:+')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth:+'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-database:+'
+    implementation 'com.google.firebase:firebase-storage:+'
+    implementation 'com.google.firebase:firebase-core:+'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.github.hani-momanii:SuperNova-Emoji:1.1'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+}

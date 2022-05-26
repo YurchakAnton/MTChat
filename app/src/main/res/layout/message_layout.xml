@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="5dp"
+    app:cardElevation="15dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:padding="10dp">
+        <TextView
+            android:id="@+id/message_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:textStyle="normal|bold"
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/message_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/message_user"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/message_user"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="5dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="18sp"
+            android:textColor="@color/white"/>
+
+        <com.denzcoskun.imageslider.ImageSlider
+            android:id="@+id/message_image"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            app:iss_auto_cycle="true"
+            app:iss_selected_dot="@color/fui_transparent"
+            app:iss_error_image="@drawable/ic_baseline_error_24"
+            app:iss_delay="0"
+            app:iss_period="5000"
+            app:iss_corner_radius="50"
+            android:layout_height="200dp"
+            android:layout_below="@+id/message_user"/>
+
+    </RelativeLayout>
+
+    <!--<RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:background="#AA0000">
+
+        <TextView
+            android:id="@+id/message_user"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:text="Назва матеріалу"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            android:layout_marginLeft="5dp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/message_time"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:text="Метраж матеріалу"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            android:layout_marginLeft="5dp"
+            android:layout_alignParentEnd="true"
+            android:textAlignment="viewEnd"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/message_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ціна матеріалу"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:layout_below="@id/message_time"
+            android:gravity="center"
+            android:layout_marginTop="10dp"/>
+
+
+    </RelativeLayout>-->
+</androidx.cardview.widget.CardView>
