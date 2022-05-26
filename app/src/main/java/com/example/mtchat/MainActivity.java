@@ -25,6 +25,8 @@ import com.denzcoskun.imageslider.models.SlideModel;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!TextUtils.isEmpty(inputText.getText().toString()))
+                if(!inputText.getText().toString().isEmpty())
                 {
                     checker = "text";
                     long key = new Date().getTime();
@@ -129,11 +131,8 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(), SIGN_IN_REQUEST_CODE);
         } else {
             Toast.makeText(this,
-                    "Вітаємо, " + FirebaseAuth.getInstance()
-                            .getCurrentUser()
-                            .getDisplayName(),
-                    Toast.LENGTH_LONG)
-                    .show();
+                    "Вітаємо, " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                    Toast.LENGTH_LONG).show();
             displayChatMessages();
         }
     }
@@ -202,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
                                                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                     @Override
                                                                     public void onComplete(@NonNull Task<Void> task) {
-                                                                        Toast.makeText(MainActivity.this, "Повідомлення видалено", Toast.LENGTH_SHORT).show();
                                                                     }
                                                                 });
                                                     } else {
@@ -334,14 +332,13 @@ public class MainActivity extends AppCompatActivity {
                             {
                                 if(task.isSuccessful())
                                 {
-                                    Toast.makeText(MainActivity.this, "Фото успішно загруженно...", Toast.LENGTH_SHORT).show();
                                     loadingBar.dismiss();
                                     displayChatMessages();
                                 }
                                 else
                                 {
                                     loadingBar.dismiss();
-                                    Toast.makeText(MainActivity.this,"Помилка: Попробуйте знову через декілька хвилин...",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this,"Помилка! Спробуйте знову через декілька хвилин...",Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -355,26 +352,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.menu_chat, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (item.getItemId() == R.id.menu_signout) {
-//            AuthUI.getInstance().signOut(this)
-//                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<Void> task) {
-//
-//                            Toast.makeText(MainActivity.this, "Выход выполнен", Toast.LENGTH_SHORT).show();
-//                            finish();
-//                        }
-//                    });
-//        }
-//        return true;
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_signout) {
+            AuthUI.getInstance().signOut(this)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(), SIGN_IN_REQUEST_CODE);
+                        }
+                    });
+        }
+        return true;
+    }
 
 }
