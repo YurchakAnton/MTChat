@@ -4,14 +4,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.media.Image;
@@ -47,6 +54,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -57,10 +65,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ThrowOnExtraProperties;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,8 +78,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
-import io.grpc.Context;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -87,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     private Uri fileUri;
     private ProgressDialog loadingBar;
     private boolean isImageScaled=false;
+    private ArrayList<String> existWord = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
                 startActivityForResult(intent, GalleryPick);
-                long key = new Date().getTime();
             }
         });
 
@@ -120,8 +129,13 @@ public class MainActivity extends AppCompatActivity {
                 {
                     checker = "text";
                     long key = new Date().getTime();
-                    FirebaseDatabase.getInstance().getReference().child("Messages").child(String.valueOf(key)).setValue(
-                            new Message(inputText.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getEmail(), key, checker));
+                    String[] words = {"Спосіб", "доставка", "який", "у", "засів", "оплата"};
+                    if(inputText.getText().toString().contains("?")) {
+                        existWord = containsWords(inputText.getText().toString(), words);
+                        Toast.makeText(MainActivity.this, existWord.toString(), Toast.LENGTH_LONG).show();
+                    }
+//                    FirebaseDatabase.getInstance().getReference().child("Messages").child(String.valueOf(key)).setValue(
+//                            new Message(inputText.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getEmail(), key, checker));
                     inputText.setText("");
                 }
             }
@@ -135,6 +149,20 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
             displayChatMessages();
         }
+    }
+
+    private static ArrayList<String> containsWords(String str, String[] words) {
+        ArrayList<String> existWord = new ArrayList<String>();
+        for(String word : words) {
+            if(str.toLowerCase().contains(word.toLowerCase())) {
+                existWord.add(word);
+            }
+        }
+        return existWord;
+    }
+
+    private void displayChatBotMessage() {
+
     }
 
     private void displayChatMessages() {
@@ -197,12 +225,7 @@ public class MainActivity extends AppCompatActivity {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     final DatabaseReference cartListRef = FirebaseDatabase.getInstance().getReference().child("Messages");
                                                     if (message.getUserEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
-                                                        cartListRef.child(String.valueOf(message.getMessageTime())).removeValue()
-                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                    }
-                                                                });
+                                                        cartListRef.child(String.valueOf(message.getMessageTime())).removeValue();
                                                     } else {
                                                         Toast.makeText(MainActivity.this, "Оберіть своє повідомлення", Toast.LENGTH_SHORT).show();
                                                     }
@@ -253,9 +276,6 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK)
             {
                 displayChatMessages();
-            } else {
-                Toast.makeText(MainActivity.this, "Вхід не виконано!", Toast.LENGTH_SHORT).show();
-                finish();
             }
         }
 
@@ -369,7 +389,81 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         }
+        if(item.getItemId() == R.id.menu_app) {
+            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("mt.example.motortextile");
+            if (launchIntent != null) {
+                download(getApplicationContext());
+//                initDownload();
+            }
+        }
         return true;
+    }
+
+    private void initDownload() {
+        String fileUrl;
+        StorageReference pathRef = FirebaseStorage.getInstance().getReference("Files/MTChat.apk");
+        pathRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+//                download(getApplicationContext(), uri);
+            }
+        });
+    }
+
+    private void download(Context context) {
+        Intent intent = getPackageManager().getLaunchIntentForPackage("mt.example.motortextile1");
+        if(intent != null) {
+            startActivity(intent);
+        } else {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("file/storage/emulated/0/Android/data/com.example.mtchat/files/Downloads/MTChat.apk")));
+            } catch (ActivityNotFoundException exception) {
+                System.out.println(exception);
+            }
+        }
+//        Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+//                .setDataAndType(Uri.parse("file://storage/emulated/0/Android/data/mt.example.mtchat/files/Downloads/MTChat.apk"),
+//                        "application/vnd.android.package-archive");
+//        startActivity(promptInstall);
+//        intent.setDataAndType(Uri.fromFile(c), "application/vnd.android.package-archive");
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(intent);
+//        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+//        DownloadManager.Request request = new DownloadManager.Request(uri);
+//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+//        request.setDestinationInExternalFilesDir(context, "Downloads", "MTChat.apk");
+//        long enq = downloadManager.enqueue(request);
+//        assert downloadManager != null;
+//        Snackbar snackbar = (Snackbar) Snackbar
+//                .make(findViewById(android.R.id.content), "Downloading...", Snackbar.LENGTH_LONG);
+//        snackbar.show();
+//        BroadcastReceiver receiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                String action = intent.getAction();
+//                if(DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
+//                    DownloadManager.Query query = new DownloadManager.Query();
+//                    query.setFilterById(enq);
+//                    DownloadManager dm;
+//                    dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+//                    Cursor c = dm.query(query);
+//                    if(c.moveToFirst()) {
+//                        int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
+//                        if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
+//                            String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+////                            intent = new Intent(Intent.ACTION_VIEW);
+////                            intent.setDataAndType(uriString, "application/vnd.android.package-archive");
+////                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+////                            startActivity(intent);
+//                        }
+//                    }
+//                }
+//            }
+//        };
+//        registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+//        Intent intent = new Intent(Intent.ACTION_VIEW);
+//        intent.setDataAndType(Uri.fromFile(new File(getApplicationInfo().dataDir+"files/Downloads/MTChat.apk")), "application/vnd.android.package-archive");
+//        startActivity(intent);
     }
 
 }

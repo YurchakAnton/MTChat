@@ -9,8 +9,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:background="@drawable/message_design"
+        >
         <TextView
             android:id="@+id/message_user"
             android:layout_width="wrap_content"
@@ -42,17 +43,17 @@
         <com.denzcoskun.imageslider.ImageSlider
             android:id="@+id/message_image"
             android:layout_width="match_parent"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="15dp"
-            app:iss_auto_cycle="true"
-            app:iss_selected_dot="@color/fui_transparent"
-            app:iss_error_image="@drawable/ic_baseline_error_24"
-            app:iss_delay="0"
-            app:iss_period="5000"
-            app:iss_corner_radius="50"
             android:layout_height="200dp"
-            android:layout_below="@+id/message_user"/>
+            android:layout_below="@+id/message_user"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="15dp"
+            app:iss_auto_cycle="true"
+            app:iss_corner_radius="50"
+            app:iss_delay="0"
+            app:iss_error_image="@drawable/ic_baseline_error_24"
+            app:iss_period="5000"
+            app:iss_selected_dot="@color/fui_transparent" />
 
     </RelativeLayout>
 
