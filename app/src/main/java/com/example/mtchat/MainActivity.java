@@ -2,13 +2,17 @@ package com.example.mtchat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -17,18 +21,23 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.media.Image;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.interfaces.ItemClickListener;
 import com.denzcoskun.imageslider.models.SlideModel;
+
+import android.os.Environment;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -79,9 +88,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int PERMISSION_REQUEST_CODE = 200;
     private static int SIGN_IN_REQUEST_CODE = 1;
     private FirebaseListAdapter<Message> adapter;
     private EditText inputText;
@@ -97,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog loadingBar;
     private boolean isImageScaled=false;
     private ArrayList<String> existWord = new ArrayList<String>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnSend.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onClick(View v) {
                 if(!inputText.getText().toString().isEmpty())
@@ -140,6 +156,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
 
         if(FirebaseAuth.getInstance().getCurrentUser()==null) {
             startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(), SIGN_IN_REQUEST_CODE);
@@ -392,8 +410,7 @@ public class MainActivity extends AppCompatActivity {
         if(item.getItemId() == R.id.menu_app) {
             Intent launchIntent = getPackageManager().getLaunchIntentForPackage("mt.example.motortextile");
             if (launchIntent != null) {
-                download(getApplicationContext());
-//                initDownload();
+                initDownload();
             }
         }
         return true;
@@ -405,65 +422,51 @@ public class MainActivity extends AppCompatActivity {
         pathRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-//                download(getApplicationContext(), uri);
+                download(getApplicationContext(), uri);
             }
         });
     }
 
-    private void download(Context context) {
+    private void download(Context context, Uri uri) {
         Intent intent = getPackageManager().getLaunchIntentForPackage("mt.example.motortextile1");
         if(intent != null) {
             startActivity(intent);
         } else {
-            try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("file/storage/emulated/0/Android/data/com.example.mtchat/files/Downloads/MTChat.apk")));
-            } catch (ActivityNotFoundException exception) {
-                System.out.println(exception);
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalFilesDir(context, "Downloads", "MTChat.apk");
+        long enq = downloadManager.enqueue(request);
+        assert downloadManager != null;
+        Snackbar snackbar = (Snackbar) Snackbar
+                .make(findViewById(android.R.id.content), "Downloading...", Snackbar.LENGTH_LONG);
+        snackbar.show();
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if(DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
+                    DownloadManager.Query query = new DownloadManager.Query();
+                    query.setFilterById(enq);
+                    DownloadManager dm;
+                    dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                    Cursor c = dm.query(query);
+                    if(c.moveToFirst()) {
+                        int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                        if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
+                            File file = new File("/storage/emulated/0/Android/data/com.example.mtchat/files/Downloads/MTChat.apk");
+                            Uri uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID+".provider", file);
+                            Intent install = new Intent(Intent.ACTION_VIEW);
+                            install.setDataAndType(uri, "application/vnd.android.package-archive");
+                            install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            startActivity(install);
+                        }
+                    }
+                }
             }
+        };
+        registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         }
-//        Intent promptInstall = new Intent(Intent.ACTION_VIEW)
-//                .setDataAndType(Uri.parse("file://storage/emulated/0/Android/data/mt.example.mtchat/files/Downloads/MTChat.apk"),
-//                        "application/vnd.android.package-archive");
-//        startActivity(promptInstall);
-//        intent.setDataAndType(Uri.fromFile(c), "application/vnd.android.package-archive");
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(intent);
-//        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-//        DownloadManager.Request request = new DownloadManager.Request(uri);
-//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-//        request.setDestinationInExternalFilesDir(context, "Downloads", "MTChat.apk");
-//        long enq = downloadManager.enqueue(request);
-//        assert downloadManager != null;
-//        Snackbar snackbar = (Snackbar) Snackbar
-//                .make(findViewById(android.R.id.content), "Downloading...", Snackbar.LENGTH_LONG);
-//        snackbar.show();
-//        BroadcastReceiver receiver = new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                String action = intent.getAction();
-//                if(DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-//                    DownloadManager.Query query = new DownloadManager.Query();
-//                    query.setFilterById(enq);
-//                    DownloadManager dm;
-//                    dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-//                    Cursor c = dm.query(query);
-//                    if(c.moveToFirst()) {
-//                        int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
-//                        if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
-//                            String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-////                            intent = new Intent(Intent.ACTION_VIEW);
-////                            intent.setDataAndType(uriString, "application/vnd.android.package-archive");
-////                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-////                            startActivity(intent);
-//                        }
-//                    }
-//                }
-//            }
-//        };
-//        registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-//        Intent intent = new Intent(Intent.ACTION_VIEW);
-//        intent.setDataAndType(Uri.fromFile(new File(getApplicationInfo().dataDir+"files/Downloads/MTChat.apk")), "application/vnd.android.package-archive");
-//        startActivity(intent);
     }
-
 }
