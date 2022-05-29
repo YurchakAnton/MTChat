@@ -10,6 +10,8 @@ import com.denzcoskun.imageslider.ImageSlider;
 import com.example.mtchat.ItemClickListner;
 import com.example.mtchat.Model.Message;
 import com.example.mtchat.R;
+import com.github.library.bubbleview.BubbleImageView;
+import com.github.library.bubbleview.BubbleTextView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,8 +19,9 @@ import java.util.List;
 
 public class MessageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
 {
-    public TextView messageText, messageUser, messageTime;
-    public ImageSlider messageImage;
+    public BubbleTextView messageText;
+    public BubbleImageView messageImage;
+    public TextView messageUser, messageTime;
     private ItemClickListner itemClickListner;
 
     public MessageViewHolder(@NonNull View itemView)

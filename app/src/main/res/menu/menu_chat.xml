@@ -5,11 +5,6 @@
         android:title="Sing out"
         android:id="@+id/menu_signout"
         app:showAsAction="never"/>
-    <item
-        android:title="App"
-        android:id="@+id/menu_app"
-        app:showAsAction="never"/>
-        />
 <!--        android:icon="@drawable/logout"-->
 
 </menu>

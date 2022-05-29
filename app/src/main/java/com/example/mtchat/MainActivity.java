@@ -2,56 +2,29 @@ package com.example.mtchat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
-import android.app.DownloadManager;
-import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.res.Configuration;
-import android.database.Cursor;
-import android.database.DataSetObservable;
-import android.database.DataSetObserver;
-import android.media.Image;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
-import com.denzcoskun.imageslider.ImageSlider;
-import com.denzcoskun.imageslider.constants.ScaleTypes;
-import com.denzcoskun.imageslider.interfaces.ItemClickListener;
-import com.denzcoskun.imageslider.models.SlideModel;
-
-import android.os.Environment;
-import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
-import com.example.mtchat.MessageViewHolder;
 import com.example.mtchat.Model.Message;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -63,39 +36,24 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ThrowOnExtraProperties;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PERMISSION_REQUEST_CODE = 200;
     private static int SIGN_IN_REQUEST_CODE = 1;
     private FirebaseListAdapter<Message> adapter;
     private EditText inputText;
@@ -138,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnSend.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onClick(View v) {
                 if(!inputText.getText().toString().isEmpty())
@@ -150,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
                         existWord = containsWords(inputText.getText().toString(), words);
                         Toast.makeText(MainActivity.this, existWord.toString(), Toast.LENGTH_LONG).show();
                     }
-//                    FirebaseDatabase.getInstance().getReference().child("Messages").child(String.valueOf(key)).setValue(
-//                            new Message(inputText.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getEmail(), key, checker));
+                    FirebaseDatabase.getInstance().getReference().child("Messages").child(String.valueOf(key)).setValue(
+                            new Message(inputText.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getEmail(), key, checker));
                     inputText.setText("");
                 }
             }
@@ -191,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseRecyclerAdapter<Message, MessageViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Message, MessageViewHolder>(options) {
+
                     @Override
                     protected void onBindViewHolder(@NonNull MessageViewHolder messageViewHolder, int i, @NonNull Message message) {
                         if(message.getTypeOfMessage().equals("text"))
@@ -203,9 +161,7 @@ public class MainActivity extends AppCompatActivity {
                         {
                             messageViewHolder.messageImage.setVisibility(View.VISIBLE);
                             messageViewHolder.messageText.setVisibility(View.GONE);
-                            List<SlideModel> slideModelList = new ArrayList<>();
-                            slideModelList.add(new SlideModel(message.getImage(), ScaleTypes.FIT));
-                            messageViewHolder.messageImage.setImageList(slideModelList, ScaleTypes.CENTER_CROP);
+                            Picasso.get().load(message.getImage()).fit().into(messageViewHolder.messageImage);
                         }
                         messageViewHolder.messageUser.setText(message.getMessageUser());
                         messageViewHolder.messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm)", message.getMessageTime()));
@@ -280,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                         return holder;
                     }
+
                 };
         listView.setAdapter(adapter);
         adapter.startListening();
@@ -315,8 +272,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e)
                     {
-                        String message = e.toString();
-                        Toast.makeText(MainActivity.this, "Помилка: " + message, Toast.LENGTH_SHORT).show();
                         loadingBar.dismiss();
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -407,66 +362,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         }
-        if(item.getItemId() == R.id.menu_app) {
-            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("mt.example.motortextile");
-            if (launchIntent != null) {
-                initDownload();
-            }
-        }
         return true;
     }
 
-    private void initDownload() {
-        String fileUrl;
-        StorageReference pathRef = FirebaseStorage.getInstance().getReference("Files/MTChat.apk");
-        pathRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                download(getApplicationContext(), uri);
-            }
-        });
-    }
-
-    private void download(Context context, Uri uri) {
-        Intent intent = getPackageManager().getLaunchIntentForPackage("mt.example.motortextile1");
-        if(intent != null) {
-            startActivity(intent);
-        } else {
-        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalFilesDir(context, "Downloads", "MTChat.apk");
-        long enq = downloadManager.enqueue(request);
-        assert downloadManager != null;
-        Snackbar snackbar = (Snackbar) Snackbar
-                .make(findViewById(android.R.id.content), "Downloading...", Snackbar.LENGTH_LONG);
-        snackbar.show();
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if(DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-                    DownloadManager.Query query = new DownloadManager.Query();
-                    query.setFilterById(enq);
-                    DownloadManager dm;
-                    dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                    Cursor c = dm.query(query);
-                    if(c.moveToFirst()) {
-                        int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
-                        if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
-                            File file = new File("/storage/emulated/0/Android/data/com.example.mtchat/files/Downloads/MTChat.apk");
-                            Uri uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID+".provider", file);
-                            Intent install = new Intent(Intent.ACTION_VIEW);
-                            install.setDataAndType(uri, "application/vnd.android.package-archive");
-                            install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            startActivity(install);
-                        }
-                    }
-                }
-            }
-        };
-        registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        }
-    }
 }

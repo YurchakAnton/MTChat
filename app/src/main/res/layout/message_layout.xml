@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="5dp"
     app:cardElevation="15dp">
 
@@ -10,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="10dp"
-        android:background="@drawable/message_design"
+        android:background="@color/black"
         >
         <TextView
             android:id="@+id/message_user"
@@ -29,7 +30,7 @@
             android:layout_alignParentEnd="true"
             android:textColor="@color/white"/>
 
-        <TextView
+        <com.github.library.bubbleview.BubbleTextView
             android:id="@+id/message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,22 +39,30 @@
             android:layout_marginTop="5dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="18sp"
-            android:textColor="@color/white"/>
+            android:textColor="@color/black"
+            android:padding="10dp"
+            app:angle="5dp"
+            app:arrowWidth="5dp"
+            app:arrowHeight="10dp"
+            app:arrowPosition="10dp"
+            app:arrowLocation="left"
+            app:bubbleColor="@color/red"
+            app:arrowCenter="true"/>
 
-        <com.denzcoskun.imageslider.ImageSlider
+        <com.github.library.bubbleview.BubbleImageView
             android:id="@+id/message_image"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_below="@+id/message_user"
-            android:layout_marginLeft="15dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="15dp"
-            app:iss_auto_cycle="true"
-            app:iss_corner_radius="50"
-            app:iss_delay="0"
-            app:iss_error_image="@drawable/ic_baseline_error_24"
-            app:iss_period="5000"
-            app:iss_selected_dot="@color/fui_transparent" />
+            app:angle="5dp"
+            app:arrowWidth="5dp"
+            app:arrowHeight="10dp"
+            app:arrowPosition="5dp"
+            app:arrowLocation="left"
+            app:bubbleColor="@color/red"
+            app:arrowCenter="true"/>
 
     </RelativeLayout>
 

@@ -55,6 +55,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:+'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.hani-momanii:SuperNova-Emoji:1.1'
+    implementation 'com.github.lguipeng:BubbleView:1.0.1'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
 }
