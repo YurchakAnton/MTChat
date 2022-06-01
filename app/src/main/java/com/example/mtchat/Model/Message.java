@@ -1,67 +1,93 @@
 package com.example.mtchat.Model;
 
+import org.json.JSONObject;
 
-import java.util.Date;
+import java.util.List;
 
 public class Message
 {
-    private String messageText, messageUser, userEmail, typeOfMessage, image;
-    private long messageTime;
+    private int id;
+    private String type;
+    private String sender;
+    Data data;
+    private String created_at;
+    private String updated_at;
 
-    public Message(String messageText, String messageUser, String userEmail, long messageTime, String typeOfMessage) {
-        this.messageText = messageText;
-        this.messageUser = messageUser;
-        this.userEmail = userEmail;
-        this.messageTime = messageTime;
-        this.typeOfMessage = typeOfMessage;
-        this.image = image;
+    public Message(String type, String sender) {
+        this.type = type;
+        this.sender = sender;
+        this.data = data;
     }
 
-    public Message()
-    {
+    // Getter Methods
+
+    public int getId() {
+        return id;
     }
 
-    public String getMessageText() {
-        return messageText;
+    public String getType() {
+        return type;
     }
 
-    public void setMessageText(String messageText) {
-        this.messageText = messageText;
+    public String getSender() {
+        return sender;
     }
 
-    public String getMessageUser() {
-        return messageUser;
+    public Data getData() {
+        return data;
     }
 
-    public void setMessageUser(String messageUser) {
-        this.messageUser = messageUser;
+    public String getCreated_at() {
+        return created_at;
     }
 
-    public long getMessageTime() {
-        return messageTime;
+    public String getUpdated_at() {
+        return updated_at;
     }
 
-    public void setMessageTime(long messageTime) {
-        this.messageTime = messageTime;
+    // Setter Methods
+
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getUserEmail() {
-        return userEmail;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getTypeOfMessage() {
-        return typeOfMessage;
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
-    public void setTypeOfMessage(String typeOfMessage) {
-        this.typeOfMessage = typeOfMessage;
+    public void setData(Data data) {
+        this.data = data;
     }
 
-    public String getImage() {
-        return image;
+    public void setCreated_at(String created_at) {
+        this.created_at = created_at;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setUpdated_at(String updated_at) {
+        this.updated_at = updated_at;
+    }
+}
+
+class Data {
+    private String text;
+
+    public Data(String text) {
+        this.text = text;
+    }
+
+// Getter Methods
+
+    public String getText() {
+        return text;
+    }
+
+    // Setter Methods
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

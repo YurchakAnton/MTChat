@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:inputType="textMultiLine"
-            android:textSize="12dp"
+            android:textSize="16dp"
             android:lines="8"
             android:minLines="1"
             android:maxLines="10"
@@ -70,12 +70,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:descendantFocusability="blocksDescendants">
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_of_messages"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:divider="@android:color/transparent">
-            </androidx.recyclerview.widget.RecyclerView>
+                android:divider="@android:color/transparent" />
         </RelativeLayout>
     </androidx.core.widget.NestedScrollView>
 
