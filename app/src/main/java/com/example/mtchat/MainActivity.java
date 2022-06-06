@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
     private Uri fileUri;
     private ProgressDialog loadingBar;
     private boolean isImageScaled=false;
-    private ArrayList<String> existWord = new ArrayList<String>();
 
 
     @Override
@@ -102,11 +101,6 @@ public class MainActivity extends AppCompatActivity {
                 {
                     checker = "text";
                     long key = new Date().getTime();
-                    String[] words = {"Спосіб", "доставка", "який", "у", "засів", "оплата"};
-                    if(inputText.getText().toString().contains("?")) {
-                        existWord = containsWords(inputText.getText().toString(), words);
-                        Toast.makeText(MainActivity.this, existWord.toString(), Toast.LENGTH_LONG).show();
-                    }
                     FirebaseDatabase.getInstance().getReference().child("Messages").child(String.valueOf(key)).setValue(
                             new Message(inputText.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getEmail(), key, checker));
                     inputText.setText("");
@@ -126,19 +120,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private static ArrayList<String> containsWords(String str, String[] words) {
-        ArrayList<String> existWord = new ArrayList<String>();
-        for(String word : words) {
-            if(str.toLowerCase().contains(word.toLowerCase())) {
-                existWord.add(word);
-            }
-        }
-        return existWord;
-    }
 
-    private void displayChatBotMessage() {
-
-    }
 
     private void displayChatMessages() {
         FirebaseRecyclerOptions<Message> options =
